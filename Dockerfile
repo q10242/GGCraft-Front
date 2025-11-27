@@ -1,5 +1,5 @@
-# Build stage - use base image from GCR
-ARG BASE_IMAGE=gcr.io/your-project-id/ggcraft-vue-base:latest
+# Build stage - use base image from Artifact Registry
+ARG BASE_IMAGE=asia-east1-docker.pkg.dev/fields-287809/ggcraft-container/ggcraft-vue-base:latest
 FROM ${BASE_IMAGE} AS builder
 
 WORKDIR /app

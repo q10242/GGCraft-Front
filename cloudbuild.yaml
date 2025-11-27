@@ -1,26 +1,26 @@
 steps:
-  # Build the container image using base image from GCR
+  # Build the container image using base image from Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
       - '--build-arg'
-      - 'BASE_IMAGE=gcr.io/$PROJECT_ID/ggcraft-vue-base:latest'
+      - 'BASE_IMAGE=asia-east1-docker.pkg.dev/$PROJECT_ID/ggcraft-container/ggcraft-vue-base:latest'
       - '-t'
-      - 'gcr.io/$PROJECT_ID/ggcraft-front:$COMMIT_SHA'
+      - 'asia-east1-docker.pkg.dev/$PROJECT_ID/ggcraft-container/ggcraft-front:$COMMIT_SHA'
       - '-t'
-      - 'gcr.io/$PROJECT_ID/ggcraft-front:latest'
+      - 'asia-east1-docker.pkg.dev/$PROJECT_ID/ggcraft-container/ggcraft-front:latest'
       - '.'
 
-  # Push the container image to Container Registry
+  # Push the container image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
-      - 'gcr.io/$PROJECT_ID/ggcraft-front:$COMMIT_SHA'
+      - 'asia-east1-docker.pkg.dev/$PROJECT_ID/ggcraft-container/ggcraft-front:$COMMIT_SHA'
 
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
-      - 'gcr.io/$PROJECT_ID/ggcraft-front:latest'
+      - 'asia-east1-docker.pkg.dev/$PROJECT_ID/ggcraft-container/ggcraft-front:latest'
 
   # Deploy container image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -30,7 +30,7 @@ steps:
       - 'deploy'
       - 'ggcraft-front'
       - '--image'
-      - 'gcr.io/$PROJECT_ID/ggcraft-front:$COMMIT_SHA'
+      - 'asia-east1-docker.pkg.dev/$PROJECT_ID/ggcraft-container/ggcraft-front:$COMMIT_SHA'
       - '--region'
       - 'asia-east1'
       - '--platform'
@@ -50,8 +50,8 @@ steps:
       - '60'
 
 images:
-  - 'gcr.io/$PROJECT_ID/ggcraft-front:$COMMIT_SHA'
-  - 'gcr.io/$PROJECT_ID/ggcraft-front:latest'
+  - 'asia-east1-docker.pkg.dev/$PROJECT_ID/ggcraft-container/ggcraft-front:$COMMIT_SHA'
+  - 'asia-east1-docker.pkg.dev/$PROJECT_ID/ggcraft-container/ggcraft-front:latest'
 
 timeout: '1200s'
 
