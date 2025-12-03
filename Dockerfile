@@ -4,6 +4,12 @@ FROM ${BASE_IMAGE} AS builder
 
 WORKDIR /app
 
+# Copy package files first for better caching
+COPY package*.json ./
+
+# Install dependencies (including devDependencies needed for build)
+RUN npm ci
+
 # Copy all source files
 COPY . .
 
