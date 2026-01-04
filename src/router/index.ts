@@ -88,6 +88,12 @@ const router = createRouter({
       props: true,
     },
     {
+      path: '/teams/:id/members/add',
+      name: 'team-add-member',
+      component: () => import('../views/TeamAddMemberView.vue'),
+      props: true,
+    },
+    {
       path: '/teams/:id/history',
       name: 'team-history',
       component: () => import('../views/InvitationHistoryView.vue'),

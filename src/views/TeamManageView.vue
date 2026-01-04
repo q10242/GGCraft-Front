@@ -8,10 +8,12 @@ import LoadingState from '@/components/ui/LoadingState.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import AvatarUploader from '@/components/upload/AvatarUploader.vue'
 import { teamService } from '@/services/teams'
+import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
 const queryClient = useQueryClient()
 const id = route.params.id as string
+const authStore = useAuthStore()
 
 const teamQuery = useQuery({
   queryKey: ['team', id],
@@ -114,6 +116,13 @@ const handleUploaded = (payload: { url: string }) => {
                 <p class="font-semibold">{{ member.name || member.email }}</p>
                 <p class="text-xs text-slate-500">角色：{{ member.role || '成員' }}</p>
               </div>
+              <button
+                v-if="member.id !== authStore.user?.id"
+                class="rounded-md border border-slate-200 px-2 py-1 text-[11px] font-semibold text-red-600 hover:border-red-300"
+                @click="teamService.removeMember(id, member.id).then(() => membersQuery.refetch())"
+              >
+                移除
+              </button>
             </li>
           </ul>
 
