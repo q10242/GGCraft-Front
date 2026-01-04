@@ -1,4 +1,5 @@
 import api from './api'
+import type { UserProfile } from './user'
 
 export interface LoginCredentials {
   email: string
@@ -48,12 +49,21 @@ export const authService = {
     return response.data
   },
 
-  async getUser(): Promise<any> {
-    const response = await api.get('/auth/me')
+  async getUser(): Promise<UserProfile> {
+    const response = await api.get<UserProfile>('/auth/me')
     return response.data
   },
 
   isAuthenticated(): boolean {
     return !!localStorage.getItem('token')
+  },
+
+  async resendVerificationEmail(): Promise<void> {
+    await api.post('/auth/email/resend')
+  },
+
+  async verifyEmail(params: { id: string; hash: string; expires: string; signature: string }): Promise<void> {
+    const { id, hash, expires, signature } = params
+    await api.get(`/auth/email/verify/${id}/${hash}`, { params: { expires, signature } })
   },
 }
