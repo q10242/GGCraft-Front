@@ -21,4 +21,9 @@ export const userService = {
     const { data } = await api.get('/user')
     return data
   },
+
+  async updateProfile(payload: Partial<UserProfile & { avatar_url?: string }>) {
+    const { data } = await api.patch('/user', payload)
+    return data
+  },
 }

@@ -6,9 +6,13 @@ import PageHeader from '@/components/ui/PageHeader.vue'
 import SectionCard from '@/components/ui/SectionCard.vue'
 import LoadingState from '@/components/ui/LoadingState.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
+import AvatarUploader from '@/components/upload/AvatarUploader.vue'
 import { RouterLink } from 'vue-router'
+import { userService } from '@/services/user'
+import { useMutation, useQueryClient } from '@tanstack/vue-query'
 
 const authStore = useAuthStore()
+const queryClient = useQueryClient()
 
 const { data, isLoading, error, refetch } = useQuery({
   queryKey: ['me'],
@@ -17,6 +21,18 @@ const { data, isLoading, error, refetch } = useQuery({
 })
 
 const user = computed(() => data?.value)
+
+const updateAvatarMutation = useMutation({
+  mutationFn: async (payload: { url: string }) => {
+    // 假設後端支援 PATCH /user 更新頭像欄位 avatar_url
+    return userService.updateProfile({ avatar_url: payload.url })
+  },
+  onSuccess: () => queryClient.invalidateQueries({ queryKey: ['me'] }),
+})
+
+const handleAvatarUploaded = (payload: { url: string }) => {
+  updateAvatarMutation.mutate({ url: payload.url })
+}
 </script>
 
 <template>
@@ -50,6 +66,18 @@ const user = computed(() => data?.value)
         <LoadingState v-if="isLoading" message="載入個人資料..." />
         <p v-else-if="error" class="text-sm text-red-600">讀取失敗，請重試。</p>
         <div v-else-if="user" class="space-y-2 text-sm text-slate-700">
+          <div class="flex items-center gap-4">
+            <div class="h-16 w-16 overflow-hidden rounded-full border border-slate-200 bg-slate-100">
+              <img v-if="user.avatar_url" :src="user.avatar_url" alt="avatar" class="h-full w-full object-cover" />
+            </div>
+            <AvatarUploader
+              scope="user"
+              :reference-id="user.id"
+              :initial-url="user.avatar_url"
+              label="個人頭像"
+              @uploaded="handleAvatarUploaded"
+            />
+          </div>
           <p><span class="font-semibold">名稱：</span>{{ user.name }}</p>
           <p><span class="font-semibold">Email：</span>{{ user.email }}</p>
           <button

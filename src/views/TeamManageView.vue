@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
+import { ref, watch } from 'vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import SectionCard from '@/components/ui/SectionCard.vue'
 import LoadingState from '@/components/ui/LoadingState.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
+import AvatarUploader from '@/components/upload/AvatarUploader.vue'
 import { teamService } from '@/services/teams'
 
 const route = useRoute()
@@ -32,6 +34,20 @@ const addMemberMutation = useMutation({
   mutationFn: (values: { user_id: number; role?: string }) => teamService.addMember(id, values),
   onSuccess: () => queryClient.invalidateQueries({ queryKey: ['team', id, 'members'] }),
 })
+
+const formValue = ref<any>({})
+
+watch(
+  () => teamQuery.data?.value,
+  (val) => {
+    if (val) formValue.value = { ...val }
+  },
+  { immediate: true }
+)
+
+const handleUploaded = (payload: { url: string }) => {
+  formValue.value = { ...formValue.value, logo_url: payload.url }
+}
 </script>
 
 <template>
@@ -53,12 +69,19 @@ const addMemberMutation = useMutation({
           v-else
           type="form"
           :actions="false"
-          :value="teamQuery.data"
+          :value="formValue"
           @submit="updateMutation.mutate"
         >
           <div class="grid gap-4">
             <FormKit type="text" name="name" label="隊伍名稱" validation="required" />
-            <FormKit type="text" name="logo_url" label="Logo URL" />
+            <FormKit type="hidden" name="logo_url" :value="formValue?.logo_url" />
+            <AvatarUploader
+              scope="team"
+              :reference-id="id"
+              label="隊伍 Logo"
+              :initial-url="formValue?.logo_url"
+              @uploaded="handleUploaded"
+            />
             <FormKit type="textarea" name="description" label="簡介" />
             <button
               type="submit"
