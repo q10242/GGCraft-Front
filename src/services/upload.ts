@@ -19,4 +19,13 @@ export const uploadService = {
     })
     return data
   },
+
+  async moveAvatar(payload: { path: string; scope: 'user' | 'team'; referenceId: number | string }) {
+    const { data } = await api.post<UploadAvatarResponse>('/uploads/avatar/move', {
+      path: payload.path,
+      scope: payload.scope,
+      reference_id: payload.referenceId,
+    })
+    return data
+  },
 }

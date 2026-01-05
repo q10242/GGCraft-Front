@@ -6,21 +6,40 @@ import PageHeader from '@/components/ui/PageHeader.vue'
 import SectionCard from '@/components/ui/SectionCard.vue'
 import AvatarUploader from '@/components/upload/AvatarUploader.vue'
 import { teamService } from '@/services/teams'
+import { uploadService } from '@/services/upload'
 
 const router = useRouter()
-const formValue = ref<{ name?: string; description?: string; logo_url?: string }>({})
+const formValue = ref<{ name?: string; description?: string; logo_url?: string; logo_path?: string }>({})
 const serverError = ref<string | null>(null)
 const isSubmitting = computed(() => createMutation.isPending === true)
 
 const createMutation = useMutation({
   mutationFn: (values: { name: string; description?: string; logo_url?: string }) => teamService.create(values),
-  onSuccess: (data) => {
-    router.push(`/teams/${data.id || ''}`)
+  onSuccess: async (data) => {
+    const teamId = data?.id
+    // 若頭像存於 misc，移動至隊伍目錄並更新隊伍
+    if (teamId && formValue.value.logo_path && formValue.value.logo_path.includes('/misc/')) {
+      try {
+        const moved = await uploadService.moveAvatar({
+          path: formValue.value.logo_path,
+          scope: 'team',
+          referenceId: teamId,
+        })
+        await teamService.update(teamId, { logo_url: moved.url })
+      } catch (err) {
+        // 保留錯誤不阻斷跳轉
+      }
+    }
+    if (teamId) {
+      router.push(`/teams/${teamId}/members/add`)
+    } else {
+      router.push('/')
+    }
   },
 })
 
-const handleUploaded = (payload: { url: string }) => {
-  formValue.value = { ...formValue.value, logo_url: payload.url }
+const handleUploaded = (payload: { url: string; path: string }) => {
+  formValue.value = { ...formValue.value, logo_url: payload.url, logo_path: payload.path }
 }
 
 const handleSubmit = (values: { name: string; description?: string; logo_url?: string }) => {

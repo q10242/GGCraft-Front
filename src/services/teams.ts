@@ -6,6 +6,25 @@ export interface Team {
   logo_url?: string
   description?: string
   role?: string
+  creator?: {
+    id: number
+    name: string
+    avatar_url?: string
+  }
+  members?: Array<{
+    id: number
+    name: string
+    email: string
+    avatar_url?: string
+    pivot?: {
+      role?: string
+      joined_at?: string
+    }
+  }>
+  tournaments?: Array<{ id: number; name: string; status?: string }>
+  home_matches?: Array<any>
+  away_matches?: Array<any>
+  won_matches?: Array<any>
 }
 
 export interface MemberPayload {
@@ -36,6 +55,11 @@ export const teamService = {
 
   async addMember(id: string | number, payload: MemberPayload) {
     const { data } = await api.post(`/teams/${id}/members`, payload)
+    return data
+  },
+
+  async updateMemberRole(id: string | number, memberId: number, role: string) {
+    const { data } = await api.patch(`/teams/${id}/members/${memberId}/role`, { role })
     return data
   },
 

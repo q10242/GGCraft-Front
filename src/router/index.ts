@@ -99,6 +99,12 @@ const router = createRouter({
       component: () => import('../views/InvitationHistoryView.vue'),
       props: true,
     },
+    {
+      path: '/invitations/:token',
+      name: 'invitation-handoff',
+      component: () => import('../views/InvitationLandingView.vue'),
+      props: true,
+    },
   ],
 })
 
