@@ -75,6 +75,20 @@ export const useNotificationStore = defineStore('notifications', () => {
     })
   }
 
+  const updateInvitationStatus = (token: string, status: string) => {
+    let updated = false
+    items.value = items.value.map((item) => {
+      if (item.type === 'invitation.created' && (item.payload?.token === token || item.payload?.id === token)) {
+        updated = true
+        return { ...item, payload: { ...item.payload, status } }
+      }
+      return item
+    })
+    if (updated) {
+      persist(items.value)
+    }
+  }
+
   const addInvitationResponded = (event: any) => {
     add({
       id: makeId(),
@@ -85,6 +99,9 @@ export const useNotificationStore = defineStore('notifications', () => {
       createdAt: new Date().toISOString(),
       read: false,
     })
+    if (event.token) {
+      updateInvitationStatus(event.token, event.status)
+    }
   }
 
   const markAsRead = (id: string) => {
@@ -121,6 +138,12 @@ export const useNotificationStore = defineStore('notifications', () => {
     channel = socket.subscribe(`private-users.${auth.user.id}`)
     channel.bind('team.invitation.created', addInvitationCreated)
     channel.bind('team.invitation.responded', addInvitationResponded)
+    channel.bind_global((eventName: string, data: any) => {
+      // 保底：若有其他事件改變狀態且帶 token/status，可更新通知
+      if (eventName === 'team.invitation.responded' && data?.token && data?.status) {
+        updateInvitationStatus(data.token, data.status)
+      }
+    })
   }
 
   return {
@@ -131,5 +154,6 @@ export const useNotificationStore = defineStore('notifications', () => {
     clear,
     markAsRead,
     markAllAsRead,
+    updateInvitationStatus,
   }
 })

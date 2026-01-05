@@ -23,6 +23,7 @@ const respondInvitation = async (item: any, action: 'accept' | 'reject') => {
     store.markAsRead(item.id)
     // 標記已處理以避免重複操作
     item.payload = { ...item.payload, status: action === 'accept' ? 'accepted' : 'rejected' }
+    store.updateInvitationStatus(payload.token, item.payload.status)
   }
   if (payload.team_id) {
     queryClient.invalidateQueries({ queryKey: ['team', payload.team_id, 'invitations'] })
