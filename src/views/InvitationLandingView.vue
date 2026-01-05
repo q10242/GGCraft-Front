@@ -110,6 +110,17 @@ watch(
 
           <div v-if="success" class="rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800">
             {{ success }}
+            <div v-if="invitation.status === 'accepted'" class="mt-2">
+              <RouterLink
+                :to="`/teams/${invitation.team_id}`"
+                class="inline-flex items-center rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-800"
+              >
+                前往隊伍頁
+              </RouterLink>
+            </div>
+            <p v-else-if="invitation.status === 'rejected'" class="mt-1 text-xs text-slate-700">
+              你已婉拒邀請，若需加入請請隊長重新邀請。
+            </p>
           </div>
 
           <div class="flex flex-wrap gap-2 text-sm">
