@@ -61,7 +61,11 @@ const invitationsQuery = useQuery({
   queryKey: ['team', id, 'invitations'],
   queryFn: () => invitationService.list(id),
 })
-const invitations = computed(() => invitationsQuery.data?.value || [])
+const invitations = computed(() => invitationsQuery.data?.value?.filter((i: any) => i.status === 'pending') || [])
+const cancelInvitation = async (invitationId: number) => {
+  await invitationService.cancel(id, invitationId)
+  invitationsQuery.refetch()
+}
 
 watch(
   () => teamQuery.data?.value,
@@ -206,6 +210,12 @@ const setCaptain = async (memberId: number) => {
               <p class="font-semibold">User #{{ invite.user_id }}</p>
               <p class="text-xs text-slate-500">狀態：{{ invite.status }}</p>
             </div>
+            <button
+              class="rounded-md border border-slate-200 px-2 py-1 text-[11px] font-semibold text-red-600 hover:border-red-300"
+              @click="cancelInvitation(invite.id)"
+            >
+              取消邀請
+            </button>
           </li>
         </ul>
       </SectionCard>

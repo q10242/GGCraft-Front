@@ -9,7 +9,7 @@ const open = ref(false)
 
 const respondInvitation = async (item: any, action: 'accept' | 'reject') => {
   const payload = item?.payload || item
-  if (!payload?.token) return
+  if (!payload?.token || payload?.status && payload.status !== 'pending') return
   if (action === 'accept') {
     await invitationService.accept(payload.token)
   } else {
@@ -17,6 +17,8 @@ const respondInvitation = async (item: any, action: 'accept' | 'reject') => {
   }
   if (item?.id) {
     store.markAsRead(item.id)
+    // 標記已處理以避免重複操作
+    item.payload = { ...item.payload, status: action === 'accept' ? 'accepted' : 'rejected' }
   }
 }
 

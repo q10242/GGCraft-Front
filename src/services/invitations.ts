@@ -43,6 +43,11 @@ export const invitationService = {
     return data
   },
 
+  async cancel(teamId: string | number, invitationId: number) {
+    const { data } = await api.post(`/teams/${teamId}/invitations/${invitationId}/cancel`)
+    return data
+  },
+
   async accept(token: string) {
     const { data } = await api.post(`/invitations/${token}/accept`)
     return data

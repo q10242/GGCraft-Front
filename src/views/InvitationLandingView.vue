@@ -146,6 +146,9 @@ watch(
               查看隊伍
             </RouterLink>
           </div>
+          <p v-if="invitation.status !== 'pending'" class="text-xs text-slate-600">
+            此邀請已處理（{{ invitation.status }}），按鈕已停用。
+          </p>
         </div>
       </div>
     </SectionCard>
