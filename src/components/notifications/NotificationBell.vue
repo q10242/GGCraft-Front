@@ -8,10 +8,12 @@ const store = useNotificationStore()
 const count = computed(() => store.unreadCount)
 const open = ref(false)
 const queryClient = useQueryClient()
+const processingId = ref<string | null>(null)
 
 const respondInvitation = async (item: any, action: 'accept' | 'reject') => {
   const payload = item?.payload || item
   if (!payload?.token || payload?.status && payload.status !== 'pending') return
+  processingId.value = item?.id || null
   if (action === 'accept') {
     await invitationService.accept(payload.token)
   } else {
@@ -26,6 +28,7 @@ const respondInvitation = async (item: any, action: 'accept' | 'reject') => {
     queryClient.invalidateQueries({ queryKey: ['team', payload.team_id, 'invitations'] })
     queryClient.invalidateQueries({ queryKey: ['team', payload.team_id, 'members'] })
   }
+  processingId.value = null
 }
 
 const toggle = () => {
@@ -91,20 +94,28 @@ const formatTime = (iso: string) => {
             <span v-if="!item.read" class="mt-1 h-2 w-2 rounded-full bg-blue-500" />
           </div>
           <div v-if="item.type === 'invitation.created'" class="mt-2 flex items-center gap-2 text-xs">
-            <button
-              class="rounded-md bg-slate-900 px-3 py-1 text-white hover:bg-slate-800"
-              :disabled="item.payload?.status && item.payload.status !== 'pending'"
-              @click="respondInvitation(item, 'accept')"
-            >
-              接受
-            </button>
-            <button
-              class="rounded-md border border-slate-200 px-3 py-1 hover:border-slate-300"
-              :disabled="item.payload?.status && item.payload.status !== 'pending'"
-              @click="respondInvitation(item, 'reject')"
-            >
-              拒絕
-            </button>
+            <template v-if="item.payload?.status === 'accepted'">
+              <span class="text-green-700">已接受</span>
+            </template>
+            <template v-else-if="item.payload?.status === 'rejected'">
+              <span class="text-slate-500">已拒絕</span>
+            </template>
+            <template v-else>
+              <button
+                class="rounded-md bg-slate-900 px-3 py-1 text-white hover:bg-slate-800"
+                :disabled="processingId === item.id"
+                @click="respondInvitation(item, 'accept')"
+              >
+                {{ processingId === item.id ? '處理中...' : '接受' }}
+              </button>
+              <button
+                class="rounded-md border border-slate-200 px-3 py-1 hover:border-slate-300"
+                :disabled="processingId === item.id"
+                @click="respondInvitation(item, 'reject')"
+              >
+                {{ processingId === item.id ? '處理中...' : '拒絕' }}
+              </button>
+            </template>
             <button class="text-xs text-slate-500 hover:underline" @click="store.markAsRead(item.id)">已讀</button>
           </div>
           <div v-else class="mt-2 text-xs text-slate-600">
