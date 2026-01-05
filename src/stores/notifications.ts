@@ -104,6 +104,18 @@ export const useNotificationStore = defineStore('notifications', () => {
     }
   }
 
+  const addMemberRemoved = (event: any) => {
+    add({
+      id: makeId(),
+      type: 'team.member.removed',
+      title: '隊伍通知',
+      message: `你已被移出隊伍「${event.team?.name || event.team?.id}」`,
+      payload: event,
+      createdAt: new Date().toISOString(),
+      read: false,
+    })
+  }
+
   const markAsRead = (id: string) => {
     items.value = items.value.map((item) => (item.id === id ? { ...item, read: true } : item))
     persist(items.value)
@@ -138,6 +150,7 @@ export const useNotificationStore = defineStore('notifications', () => {
     channel = socket.subscribe(`private-users.${auth.user.id}`)
     channel.bind('team.invitation.created', addInvitationCreated)
     channel.bind('team.invitation.responded', addInvitationResponded)
+    channel.bind('team.member.removed', addMemberRemoved)
     channel.bind_global((eventName: string, data: any) => {
       // 保底：若有其他事件改變狀態且帶 token/status，可更新通知
       if (eventName === 'team.invitation.responded' && data?.token && data?.status) {

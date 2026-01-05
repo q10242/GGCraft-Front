@@ -119,6 +119,13 @@ const formatTime = (iso: string) => {
             </template>
             <button class="text-xs text-slate-500 hover:underline" @click="store.markAsRead(item.id)">已讀</button>
           </div>
+          <div v-else-if="item.type === 'team.member.removed'" class="mt-2 text-xs text-slate-600">
+            <p class="text-slate-700">
+              {{ item.payload?.remover_name ? `操作人：${item.payload.remover_name}` : '' }}
+              <span v-if="item.payload?.reason">理由：{{ item.payload.reason }}</span>
+            </p>
+            <button class="text-xs text-slate-500 hover:underline" @click="store.markAsRead(item.id)">已讀</button>
+          </div>
           <div v-else class="mt-2 text-xs text-slate-600">
             <button class="text-xs text-slate-500 hover:underline" @click="store.markAsRead(item.id)">已讀</button>
           </div>
