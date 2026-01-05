@@ -54,6 +54,7 @@ export const teamService = {
   },
 
   async addMember(id: string | number, payload: MemberPayload) {
+    // 已改為使用邀請流程，這裡保留以防後台直接加入需求
     const { data } = await api.post(`/teams/${id}/members`, payload)
     return data
   },

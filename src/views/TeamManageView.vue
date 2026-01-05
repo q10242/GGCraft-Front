@@ -35,8 +35,11 @@ const updateMutation = useMutation({
 })
 
 const addMemberMutation = useMutation({
-  mutationFn: (values: { user_id: number; role?: string }) => teamService.addMember(id, values),
-  onSuccess: () => queryClient.invalidateQueries({ queryKey: ['team', id, 'members'] }),
+  mutationFn: (values: { user_id: number; role?: string }) => invitationService.create(id, values.user_id),
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['team', id, 'members'] })
+    invitationsQuery.refetch()
+  },
 })
 
 const formValue = ref<any>({})
@@ -128,7 +131,7 @@ const setCaptain = async (memberId: number) => {
         </FormKit>
       </SectionCard>
 
-      <SectionCard title="成員管理" description="使用 api/teams/{id}/members 執行 addMember / removeMember。">
+      <SectionCard title="成員管理" description="成員列表；邀請請使用 /invitations API。">
         <LoadingState v-if="membersLoading" message="載入成員..." />
         <p v-else-if="membersQuery.error?.value" class="text-sm text-red-600">無法取得成員。</p>
         <div v-else class="space-y-3">

@@ -7,6 +7,7 @@ import SectionCard from '@/components/ui/SectionCard.vue'
 import LoadingState from '@/components/ui/LoadingState.vue'
 import UserSearchSelect from '@/components/users/UserSearchSelect.vue'
 import { teamService } from '@/services/teams'
+import { invitationService } from '@/services/invitations'
 
 const route = useRoute()
 const id = route.params.id as string
@@ -20,10 +21,7 @@ const teamQuery = useQuery({
 
 const addMutation = useMutation({
   mutationFn: () =>
-    teamService.addMember(id, {
-      user_id: selectedUser.value!.id,
-      role: role.value || undefined,
-    }),
+    invitationService.create(id, selectedUser.value!.id),
 })
 </script>
 
@@ -44,18 +42,12 @@ const addMutation = useMutation({
       </div>
     </SectionCard>
 
-    <SectionCard title="邀請成員" description="使用 api/teams/{id}/members，帶上 user_id 與角色。">
+    <SectionCard title="邀請成員" description="使用 api/teams/{id}/invitations，發送邀請郵件與通知。">
       <div class="space-y-4">
         <UserSearchSelect
           v-model="selectedUser"
           placeholder="搜尋帳號或暱稱"
           :exclude-ids="teamQuery.data?.members?.map((m: any) => m.id) || []"
-        />
-        <FormKit
-          type="text"
-          v-model="role"
-          label="角色"
-          placeholder="captain / member / sub"
         />
         <div class="flex items-center gap-2">
           <button
