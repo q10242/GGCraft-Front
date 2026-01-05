@@ -2,10 +2,12 @@
 import { computed, ref } from 'vue'
 import { useNotificationStore } from '@/stores/notifications'
 import { invitationService } from '@/services/invitations'
+import { useQueryClient } from '@tanstack/vue-query'
 
 const store = useNotificationStore()
 const count = computed(() => store.unreadCount)
 const open = ref(false)
+const queryClient = useQueryClient()
 
 const respondInvitation = async (item: any, action: 'accept' | 'reject') => {
   const payload = item?.payload || item
@@ -19,6 +21,10 @@ const respondInvitation = async (item: any, action: 'accept' | 'reject') => {
     store.markAsRead(item.id)
     // 標記已處理以避免重複操作
     item.payload = { ...item.payload, status: action === 'accept' ? 'accepted' : 'rejected' }
+  }
+  if (payload.team_id) {
+    queryClient.invalidateQueries({ queryKey: ['team', payload.team_id, 'invitations'] })
+    queryClient.invalidateQueries({ queryKey: ['team', payload.team_id, 'members'] })
   }
 }
 
@@ -87,12 +93,14 @@ const formatTime = (iso: string) => {
           <div v-if="item.type === 'invitation.created'" class="mt-2 flex items-center gap-2 text-xs">
             <button
               class="rounded-md bg-slate-900 px-3 py-1 text-white hover:bg-slate-800"
+              :disabled="item.payload?.status && item.payload.status !== 'pending'"
               @click="respondInvitation(item, 'accept')"
             >
               接受
             </button>
             <button
               class="rounded-md border border-slate-200 px-3 py-1 hover:border-slate-300"
+              :disabled="item.payload?.status && item.payload.status !== 'pending'"
               @click="respondInvitation(item, 'reject')"
             >
               拒絕
