@@ -32,6 +32,10 @@ export interface MemberPayload {
   role?: string
 }
 
+export interface RemoveMemberPayload {
+  reason?: string
+}
+
 export const teamService = {
   async create(payload: Partial<Team>) {
     const { data } = await api.post<Team>('/teams', payload)
@@ -64,8 +68,8 @@ export const teamService = {
     return data
   },
 
-  async removeMember(id: string | number, memberId: number) {
-    const { data } = await api.delete(`/teams/${id}/members/${memberId}`)
+  async removeMember(id: string | number, memberId: number, payload?: RemoveMemberPayload) {
+    const { data } = await api.delete(`/teams/${id}/members/${memberId}`, { data: payload })
     return data
   },
 

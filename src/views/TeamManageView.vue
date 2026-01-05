@@ -158,7 +158,14 @@ const setCaptain = async (memberId: number) => {
                 <button
                   v-if="member.id !== authStore.user?.id && roleLabel(member) !== 'captain'"
                   class="rounded-md border border-slate-200 px-2 py-1 text-[11px] font-semibold text-red-600 hover:border-red-300"
-                  @click="teamService.removeMember(id, member.id).then(() => membersQuery.refetch())"
+                  @click="() => {
+                    const reason = window.prompt('移除理由（可留空）：') || undefined
+                    teamService.removeMember(id, member.id, { reason }).then(() => {
+                      membersQuery.refetch()
+                      teamQuery.refetch()
+                      invitationsQuery.refetch()
+                    })
+                  }"
                 >
                   移除
                 </button>
