@@ -16,9 +16,18 @@ const teamsQuery = useQuery({
   queryFn: () => tournamentService.listTeams(id),
 })
 
-const updateStatus = useMutation({
-  mutationFn: (payload: { team_id: number; status: string }) =>
-    tournamentService.updateTeamStatus(id, payload),
+const removeTeamMutation = useMutation({
+  mutationFn: (teamId: number) => tournamentService.remove(id, { team_id: teamId }),
+  onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tournament', id, 'teams'] }),
+})
+
+const withdrawMutation = useMutation({
+  mutationFn: (teamId: number) => tournamentService.withdraw(id, { team_id: teamId }),
+  onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tournament', id, 'teams'] }),
+})
+
+const inviteMutation = useMutation({
+  mutationFn: (teamId: number) => tournamentService.invite(id, { team_id: teamId }),
   onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tournament', id, 'teams'] }),
 })
 </script>
@@ -46,26 +55,45 @@ const updateStatus = useMutation({
           <span>報名時間</span>
           <span>操作</span>
         </div>
-        <div v-for="team in teamsQuery.data.data" :key="team.id" class="grid grid-cols-[2fr,1fr,1fr,1fr] items-center border-t border-slate-100 px-4 py-3 text-sm text-slate-800">
+        <div
+          v-for="team in teamsQuery.data.data"
+          :key="team.id"
+          class="grid grid-cols-[2fr,1fr,1fr,1fr] items-center border-t border-slate-100 px-4 py-3 text-sm text-slate-800"
+        >
           <span class="font-semibold">{{ team.name }}</span>
-          <span class="text-xs uppercase tracking-[0.1em] text-slate-500">{{ team.status || 'pending' }}</span>
-          <span class="text-xs text-slate-500">{{ team.applied_at || '—' }}</span>
-          <div class="flex items-center gap-2">
+          <span class="text-xs uppercase tracking-[0.1em] text-slate-500">{{ team.pivot?.status || 'pending' }}</span>
+          <span class="text-xs text-slate-500">{{ team.pivot?.registration_time || '—' }}</span>
+          <div class="flex flex-wrap items-center gap-2">
             <button
-              class="rounded-md border border-slate-200 px-3 py-1.5 text-xs font-semibold hover:border-slate-300"
-              @click="updateStatus.mutate({ team_id: team.id, status: 'approved' })"
+              class="rounded-md border border-slate-200 px-3 py-1.5 text-xs font-semibold hover:border-slate-300 disabled:opacity-60"
+              :disabled="removeTeamMutation.isPending"
+              @click="removeTeamMutation.mutate(team.id)"
             >
-              通過
+              移除
             </button>
             <button
-              class="rounded-md border border-slate-200 px-3 py-1.5 text-xs font-semibold hover:border-slate-300"
-              @click="updateStatus.mutate({ team_id: team.id, status: 'waitlisted' })"
+              class="rounded-md border border-slate-200 px-3 py-1.5 text-xs font-semibold hover:border-slate-300 disabled:opacity-60"
+              :disabled="withdrawMutation.isPending"
+              @click="withdrawMutation.mutate(team.id)"
             >
-              候補
+              標記退出
+            </button>
+            <button
+              class="rounded-md border border-slate-200 px-3 py-1.5 text-xs font-semibold hover:border-slate-300 disabled:opacity-60"
+              :disabled="inviteMutation.isPending"
+              @click="inviteMutation.mutate(team.id)"
+            >
+              重新邀請
             </button>
           </div>
         </div>
       </div>
+      <p v-if="removeTeamMutation.error || withdrawMutation.error || inviteMutation.error" class="mt-3 text-sm text-red-600">
+        操作失敗，請稍後再試。
+      </p>
+      <p v-else-if="removeTeamMutation.data || withdrawMutation.data || inviteMutation.data" class="mt-3 text-sm text-emerald-600">
+        已更新隊伍狀態。
+      </p>
     </SectionCard>
   </section>
 </template>

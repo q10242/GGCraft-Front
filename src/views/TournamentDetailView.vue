@@ -18,11 +18,10 @@ const { data, isLoading, error } = useQuery({
     name: '示例賽事',
     status: 'draft',
     description: '填入賽事說明、規則與報名時間。',
-    registration_start: '2025-01-01',
-    registration_end: '2025-01-10',
-    box_format: 'Bo3',
-    registered_teams_count: 4,
-    team_limit: 16,
+    registration_start_date: '2025-01-01',
+    registration_deadline: '2025-01-10',
+    type: 'single_elimination',
+    max_teams: 16,
   },
 })
 </script>
@@ -50,11 +49,18 @@ const { data, isLoading, error } = useQuery({
     <div v-else-if="data" class="space-y-6">
       <SectionCard :title="data.name" :description="data.description">
         <div class="grid gap-4 text-sm text-slate-700 md:grid-cols-2">
-          <p><span class="font-semibold">狀態：</span>{{ data.status }}</p>
-          <p><span class="font-semibold">賽制：</span>{{ data.box_format || '未設定' }}</p>
-          <p><span class="font-semibold">報名開始：</span>{{ data.registration_start || '未設定' }}</p>
-          <p><span class="font-semibold">報名截止：</span>{{ data.registration_end || '未設定' }}</p>
-          <p><span class="font-semibold">隊伍：</span>{{ data.registered_teams_count || 0 }} / {{ data.team_limit || '?' }}</p>
+          <p><span class="font-semibold">狀態：</span>{{ data.status || '未設定' }}</p>
+          <p><span class="font-semibold">賽制：</span>{{ data.type || '未設定' }}</p>
+          <p><span class="font-semibold">報名開始：</span>{{ data.registration_start_date || '未設定' }}</p>
+          <p><span class="font-semibold">報名截止：</span>{{ data.registration_deadline || '未設定' }}</p>
+          <p><span class="font-semibold">檢錄開始：</span>{{ data.check_in_start_at || '未設定' }}</p>
+          <p><span class="font-semibold">檢錄截止：</span>{{ data.check_in_end_at || '未設定' }}</p>
+          <p><span class="font-semibold">開始時間：</span>{{ data.start_date || '未設定' }}</p>
+          <p><span class="font-semibold">結束時間：</span>{{ data.end_date || '未設定' }}</p>
+          <p><span class="font-semibold">隊伍上限：</span>{{ data.max_teams ?? '未設定' }}</p>
+          <p><span class="font-semibold">隊伍下限：</span>{{ data.min_teams ?? '未設定' }}</p>
+          <p><span class="font-semibold">獎金/獎品：</span>{{ data.total_prize ?? 0 }}</p>
+          <p><span class="font-semibold">報名費：</span>{{ data.entry_fee ?? 0 }}</p>
         </div>
       </SectionCard>
 
@@ -90,7 +96,7 @@ const { data, isLoading, error } = useQuery({
 
         <SectionCard title="隊伍數量" description="報名數與上限。">
           <p class="text-sm text-slate-700">
-            已報名：{{ data.registered_teams_count || 0 }} / {{ data.team_limit || '?' }}
+            隊伍上限：{{ data.max_teams || '?' }}（詳情以後端報名紀錄為準）
           </p>
         </SectionCard>
       </div>

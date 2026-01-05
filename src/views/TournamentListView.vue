@@ -21,9 +21,8 @@ const { data, isLoading, error, refetch, isFetching } = useQuery({
         id: 0,
         name: '示例賽事',
         status: 'draft',
-        registration_end: '2025-01-01',
-        registered_teams_count: 4,
-        team_limit: 16,
+        registration_deadline: '2025-01-01',
+        max_teams: 16,
       },
     ],
     meta: { current_page: 1, per_page: 10, total: 1 },
@@ -67,7 +66,7 @@ const setStatus = (next?: string) => {
           全部
         </button>
         <button
-          v-for="option in ['open', 'ongoing', 'closed']"
+          v-for="option in ['registration', 'registration_closed', 'ongoing', 'completed']"
           :key="option"
           class="rounded-full border px-3 py-1 text-xs font-semibold transition"
           :class="status === option ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 text-slate-700 hover:border-slate-300'"
@@ -107,8 +106,8 @@ const setStatus = (next?: string) => {
             </RouterLink>
           </div>
           <div class="flex flex-wrap items-center gap-4 text-sm text-slate-700">
-            <span>報名截止：{{ item.registration_end || 'N/A' }}</span>
-            <span>隊伍：{{ item.registered_teams_count || 0 }} / {{ item.team_limit || '?' }}</span>
+            <span>報名截止：{{ item.registration_deadline || '未設定' }}</span>
+            <span>隊伍上限：{{ item.max_teams || '?' }}</span>
           </div>
         </article>
 
