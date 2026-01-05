@@ -159,7 +159,9 @@ const setCaptain = async (memberId: number) => {
                   v-if="member.id !== authStore.user?.id && roleLabel(member) !== 'captain'"
                   class="rounded-md border border-slate-200 px-2 py-1 text-[11px] font-semibold text-red-600 hover:border-red-300"
                   @click="() => {
-                    const reason = window.prompt('移除理由（可留空）：') || undefined
+                    const reason = typeof window !== 'undefined'
+                      ? window.prompt('移除理由（可留空）：') || undefined
+                      : undefined
                     teamService.removeMember(id, member.id, { reason }).then(() => {
                       membersQuery.refetch()
                       teamQuery.refetch()
