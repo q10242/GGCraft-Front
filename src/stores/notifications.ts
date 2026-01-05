@@ -62,12 +62,14 @@ export const useNotificationStore = defineStore('notifications', () => {
   }
 
   const addInvitationCreated = (event: any) => {
+    // 保留 status，用於按鈕狀態顯示
+    const status = event.status || 'pending'
     add({
       id: makeId(),
       type: 'invitation.created',
       title: '隊伍邀請',
       message: `「${event.team?.name || event.team_id}」邀請你加入`,
-      payload: event,
+      payload: { ...event, status },
       createdAt: new Date().toISOString(),
       read: false,
     })
