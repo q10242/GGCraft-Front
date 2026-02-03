@@ -24,6 +24,20 @@ const { data, isLoading, error } = useQuery({
     max_teams: 16,
   },
 })
+
+const formatDateTime = (value?: string | null) => {
+  if (!value) return '未設定'
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return value
+  return date.toLocaleString(undefined, {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  })
+}
 </script>
 
 <template>
@@ -48,15 +62,25 @@ const { data, isLoading, error } = useQuery({
 
     <div v-else-if="data" class="space-y-6">
       <SectionCard :title="data.name" :description="data.description">
+        <div class="flex flex-wrap items-center gap-2 pb-4">
+          <span class="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-white">
+            {{ data.status || '未設定' }}
+          </span>
+          <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+            賽制：{{ data.type || '未設定' }}
+          </span>
+          <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+            Bo{{ data.default_best_of || 1 }}
+          </span>
+        </div>
+
         <div class="grid gap-4 text-sm text-slate-700 md:grid-cols-2">
-          <p><span class="font-semibold">狀態：</span>{{ data.status || '未設定' }}</p>
-          <p><span class="font-semibold">賽制：</span>{{ data.type || '未設定' }}</p>
-          <p><span class="font-semibold">報名開始：</span>{{ data.registration_start_date || '未設定' }}</p>
-          <p><span class="font-semibold">報名截止：</span>{{ data.registration_deadline || '未設定' }}</p>
-          <p><span class="font-semibold">檢錄開始：</span>{{ data.check_in_start_at || '未設定' }}</p>
-          <p><span class="font-semibold">檢錄截止：</span>{{ data.check_in_end_at || '未設定' }}</p>
-          <p><span class="font-semibold">開始時間：</span>{{ data.start_date || '未設定' }}</p>
-          <p><span class="font-semibold">結束時間：</span>{{ data.end_date || '未設定' }}</p>
+          <p><span class="font-semibold">報名開始：</span>{{ formatDateTime(data.registration_start_date) }}</p>
+          <p><span class="font-semibold">報名截止：</span>{{ formatDateTime(data.registration_deadline) }}</p>
+          <p><span class="font-semibold">檢錄開始：</span>{{ formatDateTime(data.check_in_start_at) }}</p>
+          <p><span class="font-semibold">檢錄截止：</span>{{ formatDateTime(data.check_in_end_at) }}</p>
+          <p><span class="font-semibold">賽事開始：</span>{{ formatDateTime(data.start_date) }}</p>
+          <p><span class="font-semibold">賽事結束：</span>{{ formatDateTime(data.end_date) }}</p>
           <p><span class="font-semibold">隊伍上限：</span>{{ data.max_teams ?? '未設定' }}</p>
           <p><span class="font-semibold">隊伍下限：</span>{{ data.min_teams ?? '未設定' }}</p>
           <p><span class="font-semibold">獎金/獎品：</span>{{ data.total_prize ?? 0 }}</p>

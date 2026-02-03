@@ -27,6 +27,15 @@ export interface Team {
   won_matches?: Array<any>
 }
 
+export interface TeamSearchItem {
+  id: number
+  name: string
+  creator?: {
+    id: number
+    name: string
+  }
+}
+
 export interface MemberPayload {
   user_id: number
   role?: string
@@ -81,5 +90,10 @@ export const teamService = {
   async tournaments(id: string | number) {
     const { data } = await api.get(`/teams/${id}/tournaments`)
     return data
+  },
+
+  async search(query: string) {
+    const { data } = await api.get('/teams/search', { params: { q: query } })
+    return data as TeamSearchItem[]
   },
 }

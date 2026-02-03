@@ -74,6 +74,15 @@ export interface SchedulePayload {
   end_date?: string | null
 }
 
+export interface TournamentInvitation {
+  id: number
+  name: string
+  creator?: { id: number; name: string }
+  status?: string
+  invite_expires_at?: string | null
+  registration_time?: string | null
+}
+
 export const tournamentService = {
   async list(params?: {
     page?: number
@@ -115,6 +124,13 @@ export const tournamentService = {
   async invite(id: string | number, payload: RegistrationPayload) {
     const { data } = await api.post(`/tournaments/${id}/invite`, payload)
     return data
+  },
+
+  async invitations(id: string | number) {
+    const { data } = await api.get<TournamentInvitation[] | { data: TournamentInvitation[] }>(
+      `/tournaments/${id}/invitations`,
+    )
+    return (data as any)?.data ?? data
   },
 
   async acceptInvitation(id: string | number, payload: InvitationActionPayload) {
