@@ -63,7 +63,8 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const resendVerificationEmail = () => authService.resendVerificationEmail()
-  const verifyEmail = (payload: { token: string; email: string }) => authService.verifyEmail(payload)
+  const verifyEmail = (payload: { id: string; hash: string; expires: string; signature: string }) =>
+    authService.verifyEmail(payload)
 
   return {
     token,

@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { userService, type UserProfile } from '@/services/user'
 
 const props = defineProps<{
-  modelValue?: Pick<UserProfile, 'id' | 'name' | 'email' | 'avatar_url'>
+  modelValue?: Pick<UserProfile, 'id' | 'name' | 'email' | 'avatar_url'> | null
   placeholder?: string
   excludeIds?: Array<number>
   label?: string

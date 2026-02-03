@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
+import { computed } from 'vue'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import SectionCard from '@/components/ui/SectionCard.vue'
@@ -15,6 +16,8 @@ const teamsQuery = useQuery({
   queryKey: ['tournament', id, 'teams'],
   queryFn: () => tournamentService.listTeams(id),
 })
+
+const teams = computed(() => teamsQuery.data?.value?.data ?? [])
 
 const removeTeamMutation = useMutation({
   mutationFn: (teamId: number) => tournamentService.remove(id, { team_id: teamId }),
@@ -41,10 +44,10 @@ const inviteMutation = useMutation({
     />
 
     <SectionCard>
-      <LoadingState v-if="teamsQuery.isLoading" message="載入名單..." />
-      <p v-else-if="teamsQuery.error" class="text-sm text-red-600">無法取得名單。</p>
+      <LoadingState v-if="teamsQuery.isLoading.value" message="載入名單..." />
+      <p v-else-if="teamsQuery.error?.value" class="text-sm text-red-600">無法取得名單。</p>
       <EmptyState
-        v-else-if="!teamsQuery.data?.data?.length"
+        v-else-if="!teams.length"
         title="尚無報名隊伍"
         description="等待隊伍提交報名。"
       />
@@ -56,7 +59,7 @@ const inviteMutation = useMutation({
           <span>操作</span>
         </div>
         <div
-          v-for="team in teamsQuery.data.data"
+          v-for="team in teams"
           :key="team.id"
           class="grid grid-cols-[2fr,1fr,1fr,1fr] items-center border-t border-slate-100 px-4 py-3 text-sm text-slate-800"
         >
@@ -66,21 +69,21 @@ const inviteMutation = useMutation({
           <div class="flex flex-wrap items-center gap-2">
             <button
               class="rounded-md border border-slate-200 px-3 py-1.5 text-xs font-semibold hover:border-slate-300 disabled:opacity-60"
-              :disabled="removeTeamMutation.isPending"
+              :disabled="removeTeamMutation.isPending.value"
               @click="removeTeamMutation.mutate(team.id)"
             >
               移除
             </button>
             <button
               class="rounded-md border border-slate-200 px-3 py-1.5 text-xs font-semibold hover:border-slate-300 disabled:opacity-60"
-              :disabled="withdrawMutation.isPending"
+              :disabled="withdrawMutation.isPending.value"
               @click="withdrawMutation.mutate(team.id)"
             >
               標記退出
             </button>
             <button
               class="rounded-md border border-slate-200 px-3 py-1.5 text-xs font-semibold hover:border-slate-300 disabled:opacity-60"
-              :disabled="inviteMutation.isPending"
+              :disabled="inviteMutation.isPending.value"
               @click="inviteMutation.mutate(team.id)"
             >
               重新邀請
@@ -88,10 +91,10 @@ const inviteMutation = useMutation({
           </div>
         </div>
       </div>
-      <p v-if="removeTeamMutation.error || withdrawMutation.error || inviteMutation.error" class="mt-3 text-sm text-red-600">
+      <p v-if="removeTeamMutation.error?.value || withdrawMutation.error?.value || inviteMutation.error?.value" class="mt-3 text-sm text-red-600">
         操作失敗，請稍後再試。
       </p>
-      <p v-else-if="removeTeamMutation.data || withdrawMutation.data || inviteMutation.data" class="mt-3 text-sm text-emerald-600">
+      <p v-else-if="removeTeamMutation.data?.value || withdrawMutation.data?.value || inviteMutation.data?.value" class="mt-3 text-sm text-emerald-600">
         已更新隊伍狀態。
       </p>
     </SectionCard>

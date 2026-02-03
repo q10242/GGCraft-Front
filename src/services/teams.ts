@@ -3,6 +3,7 @@ import api from './api'
 export interface Team {
   id: number
   name: string
+  creator_id?: number
   logo_url?: string
   description?: string
   role?: string

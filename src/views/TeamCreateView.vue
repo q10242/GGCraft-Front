@@ -11,7 +11,7 @@ import { uploadService } from '@/services/upload'
 const router = useRouter()
 const formValue = ref<{ name?: string; description?: string; logo_url?: string; logo_path?: string }>({})
 const serverError = ref<string | null>(null)
-const isSubmitting = computed(() => createMutation.isPending === true)
+const isSubmitting = computed(() => createMutation.isPending.value === true)
 
 const createMutation = useMutation({
   mutationFn: (values: { name: string; description?: string; logo_url?: string }) => teamService.create(values),

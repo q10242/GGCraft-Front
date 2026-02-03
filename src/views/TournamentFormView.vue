@@ -318,7 +318,7 @@ watch(
       :title="isEdit ? '更新賽事' : '建立賽事'"
       description="依是否存在 id 決定 POST 或 PUT api/tournaments。"
     >
-      <LoadingState v-if="isEdit && tournamentQuery.isLoading" message="載入賽事資料..." />
+      <LoadingState v-if="isEdit && tournamentQuery.isLoading.value" message="載入賽事資料..." />
       <FormKit
         v-else
         type="form"
@@ -387,7 +387,7 @@ watch(
               <p v-else-if="gamesError" class="mt-1 text-xs text-red-600">{{ gamesError }}</p>
               <p v-else-if="!filteredGames.length" class="mt-1 text-xs text-slate-500">無符合遊戲，請更改搜尋。</p>
               <p v-else-if="gameSelectionError" class="mt-1 text-xs text-red-600">{{ gameSelectionError }}</p>
-              <FormKit type="hidden" name="game_id" :value="gameId ?? ''" />
+              <FormKit type="hidden" name="game_id" :value="gameId !== null ? String(gameId) : ''" />
             </div>
           </div>
 
@@ -400,7 +400,7 @@ watch(
               validation="required|number"
               validation-visibility="blur"
             />
-            <FormKit type="number" name="min_teams" label="隊伍下限" min="2" :value="2" />
+            <FormKit type="number" name="min_teams" label="隊伍下限" min="2" value="2" />
             <FormKit type="number" name="max_waitlist" label="候補上限 (可留空)" min="0" />
             <FormKit
               type="select"
@@ -485,12 +485,12 @@ watch(
           <button
             type="submit"
             class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:-translate-y-[1px] hover:bg-slate-800 disabled:opacity-60"
-            :disabled="mutation.status === 'pending'"
+            :disabled="mutation.status.value === 'pending'"
           >
-            {{ mutation.status === 'pending' ? '送出中...' : isEdit ? '更新賽事' : '建立賽事' }}
+            {{ mutation.status.value === 'pending' ? '送出中...' : isEdit ? '更新賽事' : '建立賽事' }}
           </button>
-          <p v-if="mutation.status === 'error'" class="text-sm text-red-600">送出失敗，請檢查欄位。</p>
-          <p v-else-if="mutation.status === 'success'" class="text-sm text-emerald-600">已送出，將跳轉至賽事頁。</p>
+          <p v-if="mutation.status.value === 'error'" class="text-sm text-red-600">送出失敗，請檢查欄位。</p>
+          <p v-else-if="mutation.status.value === 'success'" class="text-sm text-emerald-600">已送出，將跳轉至賽事頁。</p>
         </div>
       </FormKit>
     </SectionCard>

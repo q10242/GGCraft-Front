@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
+import { computed } from 'vue'
 import { useQuery, useMutation } from '@tanstack/vue-query'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import SectionCard from '@/components/ui/SectionCard.vue'
@@ -13,6 +14,8 @@ const tournamentQuery = useQuery({
   queryKey: ['tournament', id],
   queryFn: () => tournamentService.detail(id),
 })
+
+const schedule = computed(() => tournamentQuery.data?.value)
 
 const triggerMutation = useMutation({
   mutationFn: (payload: any) => tournamentService.updateSchedule(id, payload),
@@ -35,19 +38,19 @@ const handleSubmit = (values: Record<string, any>) => {
     />
 
     <SectionCard title="更新時間表" description="填入需要調整的欄位即可，不變動的欄位可留白。">
-      <LoadingState v-if="tournamentQuery.isLoading" message="載入賽事..." />
-      <p v-else-if="tournamentQuery.error" class="text-sm text-red-600">無法取得賽事資料。</p>
+      <LoadingState v-if="tournamentQuery.isLoading.value" message="載入賽事..." />
+      <p v-else-if="tournamentQuery.error?.value" class="text-sm text-red-600">無法取得賽事資料。</p>
 
       <FormKit
         v-else
         type="form"
         :value="{
-          registration_start_date: tournamentQuery.data?.registration_start_date,
-          registration_deadline: tournamentQuery.data?.registration_deadline,
-          check_in_start_at: tournamentQuery.data?.check_in_start_at,
-          check_in_end_at: tournamentQuery.data?.check_in_end_at,
-          start_date: tournamentQuery.data?.start_date,
-          end_date: tournamentQuery.data?.end_date,
+          registration_start_date: schedule?.registration_start_date,
+          registration_deadline: schedule?.registration_deadline,
+          check_in_start_at: schedule?.check_in_start_at,
+          check_in_end_at: schedule?.check_in_end_at,
+          start_date: schedule?.start_date,
+          end_date: schedule?.end_date,
         }"
         :actions="false"
         @submit="handleSubmit"
@@ -63,12 +66,12 @@ const handleSubmit = (values: Record<string, any>) => {
         <button
           type="submit"
           class="mt-4 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-60"
-          :disabled="triggerMutation.isPending"
+          :disabled="triggerMutation.isPending.value"
         >
-          {{ triggerMutation.isPending ? '更新中...' : '儲存排程' }}
+          {{ triggerMutation.isPending.value ? '更新中...' : '儲存排程' }}
         </button>
-        <p v-if="triggerMutation.error" class="mt-2 text-sm text-red-600">更新失敗，請檢查輸入。</p>
-        <p v-else-if="triggerMutation.data" class="mt-2 text-sm text-emerald-600">排程已更新。</p>
+        <p v-if="triggerMutation.error?.value" class="mt-2 text-sm text-red-600">更新失敗，請檢查輸入。</p>
+        <p v-else-if="triggerMutation.data?.value" class="mt-2 text-sm text-emerald-600">排程已更新。</p>
       </FormKit>
     </SectionCard>
   </section>

@@ -278,8 +278,8 @@ watch(
             <p class="text-sm font-semibold text-slate-900">邀請中隊伍</p>
             <span class="text-xs text-slate-500">共 {{ invitedTeams.length }} 支</span>
           </div>
-          <div v-if="invitationsQuery.isFetching" class="text-xs text-slate-500">載入邀請列表中...</div>
-          <div v-else-if="invitationsQuery.error" class="text-xs text-red-600">邀請列表取得失敗。</div>
+          <div v-if="invitationsQuery.isFetching.value" class="text-xs text-slate-500">載入邀請列表中...</div>
+          <div v-else-if="invitationsQuery.error?.value" class="text-xs text-red-600">邀請列表取得失敗。</div>
           <div v-else-if="!invitedTeams.length" class="text-xs text-slate-500">目前沒有邀請中隊伍。</div>
           <div v-else class="space-y-2">
             <div
@@ -319,12 +319,12 @@ watch(
         <button
           type="submit"
           class="mt-3 w-full rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-60"
-          :disabled="confirmMutation.isPending"
+          :disabled="confirmMutation.isPending.value"
         >
-          {{ confirmMutation.isPending ? '確認中...' : '確認報名' }}
+          {{ confirmMutation.isPending.value ? '確認中...' : '確認報名' }}
         </button>
-        <p v-if="confirmMutation.error" class="mt-2 text-sm text-red-600">確認失敗，請檢查 token。</p>
-        <p v-else-if="confirmMutation.data" class="mt-2 text-sm text-emerald-600">已確認報名。</p>
+        <p v-if="confirmMutation.error?.value" class="mt-2 text-sm text-red-600">確認失敗，請檢查 token。</p>
+        <p v-else-if="confirmMutation.data?.value" class="mt-2 text-sm text-emerald-600">已確認報名。</p>
       </FormKit>
     </SectionCard>
 
@@ -347,12 +347,12 @@ watch(
         <button
           type="submit"
           class="mt-3 w-full rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-800 hover:border-slate-300 disabled:opacity-60"
-          :disabled="withdrawMutation.isPending"
+          :disabled="withdrawMutation.isPending.value"
         >
-          {{ withdrawMutation.isPending ? '處理中...' : '退出賽事' }}
+          {{ withdrawMutation.isPending.value ? '處理中...' : '退出賽事' }}
         </button>
-        <p v-if="withdrawMutation.error" class="mt-2 text-sm text-red-600">退出失敗，請稍後再試。</p>
-        <p v-else-if="withdrawMutation.data" class="mt-2 text-sm text-emerald-600">已退出賽事。</p>
+        <p v-if="withdrawMutation.error?.value" class="mt-2 text-sm text-red-600">退出失敗，請稍後再試。</p>
+        <p v-else-if="withdrawMutation.data?.value" class="mt-2 text-sm text-emerald-600">已退出賽事。</p>
       </FormKit>
     </SectionCard>
   </section>

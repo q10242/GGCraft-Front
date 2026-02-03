@@ -43,7 +43,7 @@ const addMemberMutation = useMutation({
 })
 
 const formValue = ref<any>({})
-const selectedUser = ref<{ id: number; name: string; email: string } | null>(null)
+const selectedUser = ref<{ id: number; name: string; email: string; avatar_url?: string } | null>(null)
 const newRole = ref<string>('')
 
 const teamLoading = computed(() => teamQuery.isPending.value)
@@ -124,7 +124,7 @@ const removeMember = async (memberId: number) => {
           type="form"
           :actions="false"
           :value="formValue"
-          @submit="updateMutation.mutate"
+          @submit="(values) => updateMutation.mutate(values)"
         >
           <div class="grid gap-4">
             <FormKit type="text" name="name" label="隊伍名稱" validation="required" />
